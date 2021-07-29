@@ -1,0 +1,10 @@
+POST http://localhost:8080/api/nursinghome/resident
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "dateOfBirth": "1890-10-10",
+  "gender": "MALE"
+}
+
+###
