@@ -110,23 +110,17 @@ class ResidentControllerTest {
 
     @Test
     void deleteResident() {
-        ResidentDto resident = template.postForObject("/api/nursinghome/resident",
-                new CreateResidentCommand("John Doe", LocalDate.of(1950, 10, 10), Gender.MALE),
-                ResidentDto.class);
-        template.put("/api/nursinghome/resident/" + resident.getId(),
-                new UpdateResidentStatusCommand(ResidentStatus.MOVED_OUT));
+        ResidentDto resident = postResident("John Doe", LocalDate.of(1950, 10, 10), Gender.MALE);
+
+        template.delete("/api/nursinghome/resident/" + resident.getId());
 
         List<ResidentDto> result = template.exchange("/api/nursinghome/resident",
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<ResidentDto>>() {
-                },
-                Map.of("status", "MOVED_OUT")).getBody();
+                new ParameterizedTypeReference<List<ResidentDto>>() { }).getBody();
 
         assertThat(result)
-                .hasSize(1)
-                .extracting(ResidentDto::getName)
-                .containsExactly("John Doe");
+                .hasSize(0);
     }
 
     private ResidentDto postResident(String name, LocalDate dateOfBirth, Gender gender) {
