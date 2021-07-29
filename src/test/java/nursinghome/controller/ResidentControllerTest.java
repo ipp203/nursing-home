@@ -71,7 +71,7 @@ class ResidentControllerTest {
     @Test
     void listResidents() {
         postResident("John Doe", LocalDate.of(1950, 10, 10), Gender.MALE);
-        postResident("Jane Doe", LocalDate.of(1950, 10, 10), Gender.MALE);
+        postResident("Jane Doe", LocalDate.of(1950, 10, 10), Gender.FEMALE);
         postResident("Jack Doe", LocalDate.of(1950, 10, 10), Gender.MALE);
 
         List<ResidentDto> result = template.exchange("/api/nursinghome/resident",
@@ -88,23 +88,25 @@ class ResidentControllerTest {
     }
 
     @Test
-    void updateResidentStatusAndListByStatus() {
-        ResidentDto resident = postResident("John Doe", LocalDate.of(1950, 10, 10), Gender.MALE);
+    void updateResidentStatusAndList() {
+        ResidentDto resident1 = postResident("John Doe", LocalDate.of(1950, 10, 10), Gender.MALE);
+        ResidentDto resident2 = postResident("Jane Doe", LocalDate.of(1950, 10, 10), Gender.FEMALE);
+        ResidentDto resident3 = postResident("Jack John", LocalDate.of(1950, 10, 10), Gender.MALE);
 
-        template.put("/api/nursinghome/resident/" + resident.getId(),
+        template.put("/api/nursinghome/resident/" + resident1.getId(),
+                new UpdateResidentStatusCommand(ResidentStatus.MOVED_OUT));
+        template.put("/api/nursinghome/resident/" + resident2.getId(),
                 new UpdateResidentStatusCommand(ResidentStatus.MOVED_OUT));
 
-        List<ResidentDto> result = template.exchange("/api/nursinghome/resident",
+        List<ResidentDto> result = template.exchange("/api/nursinghome/resident?status=MOVED_OUT&name=jane",
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<ResidentDto>>() {
-                },
-                Map.of("status", "MOVED_OUT")).getBody();
+                new ParameterizedTypeReference<List<ResidentDto>>() {}).getBody();
 
         assertThat(result)
                 .hasSize(1)
                 .extracting(ResidentDto::getName)
-                .containsExactly("John Doe");
+                .containsExactly("Jane Doe");
 
     }
 

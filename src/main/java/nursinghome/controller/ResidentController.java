@@ -37,8 +37,10 @@ public class ResidentController {
 
     @GetMapping
     @Operation(summary = "List residents and filter by status and birth of year")
-    public List<ResidentDto> listResidents(@RequestParam Optional<ResidentStatus> status, @RequestParam Optional<Integer> birthBeforeYear ){
-        return service.listResidents(status, birthBeforeYear);
+    public List<ResidentDto> listResidents(@RequestParam Optional<ResidentStatus> status,
+                                           @RequestParam Optional<Integer> birthBeforeYear,
+                                           @RequestParam Optional<String> name){
+        return service.listResidents(status, birthBeforeYear, name);
     }
 
     @PutMapping("/{id}")
