@@ -15,6 +15,6 @@ import javax.validation.constraints.NotNull;
 public class UpdateResidentStatusCommand {
 
     @NotNull
-    @Schema(required = true, description = "Status of resident (RESIDENT, MOVED, DIED)", example = "MOVED")
+    @Schema(required = true, description = "Status of resident (RESIDENT, MOVED_OUT, DIED)", example = "MOVED_OUT")
     private ResidentStatus status;
 }
