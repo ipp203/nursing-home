@@ -1,9 +1,6 @@
 package nursinghome.model.resident;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import nursinghome.model.meal.Meal;
 import nursinghome.model.medicine.Medicine;
 
@@ -41,6 +38,7 @@ public class Resident {
 
     @OneToMany(mappedBy = "resident", cascade = CascadeType.REMOVE)
     @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<Medicine> medicines;
 
     public Resident(String name, LocalDate dateOfBirth, Gender gender, ResidentStatus status) {

@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(statements = "delete from resident")
+@Sql(scripts = "/delete_tables.sql")
 class ResidentControllerTest {
 
     @Autowired
@@ -65,7 +65,7 @@ class ResidentControllerTest {
 
         Problem problem = template.getForObject("/api/nursinghome/resident/" + (postedResident.getId() + 1), Problem.class);
 
-        assertEquals(Status.NOT_FOUND,problem.getStatus());
+        assertEquals(Status.NOT_FOUND, problem.getStatus());
     }
 
     @Test
