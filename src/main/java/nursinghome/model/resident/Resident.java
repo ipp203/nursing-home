@@ -1,15 +1,11 @@
 package nursinghome.model.resident;
 
 import lombok.*;
-import nursinghome.model.meal.Meal;
 import nursinghome.model.medicine.Medicine;
+import nursinghome.model.room.Room;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 
@@ -41,19 +37,14 @@ public class Resident {
     @ToString.Exclude
     private Set<Medicine> medicines;
 
+    @ManyToOne
+    private Room room;
+
     public Resident(String name, LocalDate dateOfBirth, Gender gender, ResidentStatus status) {
         this.name = name;
         this.dateOfBirth = dateOfBirth;
         this.gender = gender;
         this.status = status;
-    }
-
-    public void addMedicine(Medicine medicine) {
-        if (medicines == null) {
-            medicines = new HashSet<>();
-        }
-        medicine.setResident(this);
-        medicines.add(medicine);
     }
 
     public void deleteMedicines() {

@@ -1,11 +1,11 @@
 package nursinghome.controller;
 
 import nursinghome.model.resident.Gender;
-import nursinghome.model.resident.ResidentNotFoundException;
 import nursinghome.model.resident.ResidentStatus;
 import nursinghome.model.resident.dto.CreateResidentCommand;
 import nursinghome.model.resident.dto.ResidentDto;
 import nursinghome.model.resident.dto.UpdateResidentStatusCommand;
+import nursinghome.model.room.dto.RoomDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,14 +18,13 @@ import org.zalando.problem.Status;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/delete_tables.sql")
-class ResidentControllerTest {
+class ResidentControllerIT {
 
     @Autowired
     TestRestTemplate template;
@@ -37,7 +36,6 @@ class ResidentControllerTest {
                 ResidentDto.class);
 
         assertEquals("John Doe", result.getName());
-
     }
 
     @Test
@@ -91,7 +89,6 @@ class ResidentControllerTest {
     void updateResidentStatusAndList() {
         ResidentDto resident1 = postResident("John Doe", LocalDate.of(1950, 10, 10), Gender.MALE);
         ResidentDto resident2 = postResident("Jane Doe", LocalDate.of(1950, 10, 10), Gender.FEMALE);
-        ResidentDto resident3 = postResident("Jack John", LocalDate.of(1950, 10, 10), Gender.MALE);
 
         template.put("/api/nursinghome/resident/" + resident1.getId(),
                 new UpdateResidentStatusCommand(ResidentStatus.MOVED_OUT));

@@ -6,6 +6,7 @@ import nursinghome.model.resident.dto.ResidentDto;
 import nursinghome.model.resident.ResidentStatus;
 import nursinghome.model.resident.dto.ResidentWithMedicinesDto;
 import nursinghome.model.resident.dto.UpdateResidentStatusCommand;
+import nursinghome.model.room.dto.RoomDto;
 import nursinghome.service.ResidentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -65,5 +66,12 @@ public class ResidentController {
     @Operation(summary = "Delete resident by id")
     public void deleteResident(@PathVariable("id") long id) {
         service.deleteResidentById(id);
+    }
+
+
+    @GetMapping("/{id}/room")
+    @Operation(summary = "Get resident's room")
+    public RoomDto getResidentRoom(@PathVariable("id") long id){
+       return service.getResidentsRoom(id);
     }
 }

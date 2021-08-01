@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nursinghome.model.medicine.Type;
-import nursinghome.model.resident.Resident;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -24,7 +23,7 @@ public class CreateMedicineCommand {
     private int dailyDose;
 
     @NotNull
-    @Schema(description = "Type of medicine", required = true, example = "TABLET")
+    @Schema(description = "Type of medicine (TABLET, INJECTION, DROPS, CREAM)", required = true, example = "TABLET")
     private Type type;
 
 }

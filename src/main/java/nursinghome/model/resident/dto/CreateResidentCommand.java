@@ -28,7 +28,7 @@ public class CreateResidentCommand {
     private LocalDate dateOfBirth;
 
     @NotNull
-    @Schema(required = true, example = "MALE")
+    @Schema(required = true, example = "MALE", description = "Gender of resident (MALE, FEMALE)")
     private Gender gender;
 
 }

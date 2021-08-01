@@ -1,7 +1,6 @@
 package nursinghome.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import nursinghome.model.medicine.Medicine;
 import nursinghome.model.medicine.dto.CreateMedicineCommand;
 import nursinghome.model.medicine.dto.MedicineDto;
 import nursinghome.model.medicine.dto.UpdateDailyDoseCommand;
@@ -18,7 +17,7 @@ import java.util.Optional;
 @RequestMapping("/api/nursinghome/medicine")
 public class MedicineController {
 
-    private MedicineService service;
+    private final MedicineService service;
 
     public MedicineController(MedicineService service) {
         this.service = service;

@@ -5,6 +5,7 @@ import nursinghome.model.resident.dto.CreateResidentCommand;
 import nursinghome.model.resident.dto.ResidentDto;
 import nursinghome.model.resident.dto.ResidentWithMedicinesDto;
 import nursinghome.model.resident.dto.UpdateResidentStatusCommand;
+import nursinghome.model.room.dto.RoomDto;
 import nursinghome.repository.ResidentRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -20,29 +21,29 @@ import java.util.stream.Collectors;
 public class ResidentService {
 
     private final ModelMapper modelMapper;
-    private final ResidentRepository repository;
+    private final ResidentRepository residentRepository;
 
-    public ResidentService(ModelMapper modelMapper, ResidentRepository repository) {
+    public ResidentService(ModelMapper modelMapper, ResidentRepository residentRepository) {
         this.modelMapper = modelMapper;
-        this.repository = repository;
+        this.residentRepository = residentRepository;
     }
 
     @Transactional
     public ResidentDto createResident(CreateResidentCommand command) {
         Resident resident = new Resident(command.getName(), command.getDateOfBirth(), command.getGender(), ResidentStatus.RESIDENT);
-        repository.save(resident);
+        residentRepository.save(resident);
         return modelMapper.map(resident, ResidentDto.class);
     }
 
     public ResidentWithMedicinesDto getResidentById(long id) {
-        Resident resident = repository.findById(id).orElseThrow(() -> new ResidentNotFoundException(id));
+        Resident resident = residentRepository.findById(id).orElseThrow(() -> new ResidentNotFoundException(id));
         return modelMapper.map(resident, ResidentWithMedicinesDto.class);
     }
 
     public List<ResidentDto> listResidents(Optional<ResidentStatus> status,
                                            Optional<Integer> birthBeforeYear,
                                            Optional<String> name) {
-        return repository.findAll().stream()
+        return residentRepository.findAll().stream()
                 .filter(r -> status.isEmpty() || r.getStatus() == status.get())
                 .filter(r -> birthBeforeYear.isEmpty() || r.getDateOfBirth().isBefore(LocalDate.of(birthBeforeYear.get(), 1, 1)))
                 .filter(r -> name.isEmpty() || r.getName().toLowerCase().contains(name.get().toLowerCase()))
@@ -50,24 +51,32 @@ public class ResidentService {
                 .collect(Collectors.toList());
     }
 
-
     @Transactional
     public ResidentDto updateResidentStatus(long id, UpdateResidentStatusCommand command) {
-        Resident resident = repository.findById(id).orElseThrow(() -> new ResidentNotFoundException(id));
+        Resident resident = residentRepository.findById(id).orElseThrow(() -> new ResidentNotFoundException(id));
         resident.setStatus(command.getStatus());
         if (command.getStatus() != ResidentStatus.RESIDENT) {
             resident.deleteMedicines();
+            resident.setRoom(null);
         }
         return modelMapper.map(resident, ResidentDto.class);
     }
 
     @Transactional
     public void deleteResidentById(long id) {
-        repository.deleteById(id);
+        residentRepository.deleteById(id);
     }
 
     public Map<ResidentStatus, Integer> getResidentSummaryByStatus() {
-        return repository.findAll().stream()
+        return residentRepository.findAll().stream()
                 .collect(Collectors.toMap(Resident::getStatus,r->1,Integer::sum));
+    }
+
+    public RoomDto getResidentsRoom(long id) {
+        Resident resident = residentRepository.findById(id).orElseThrow(()->new ResidentNotFoundException(id));
+        if(resident.getRoom() == null){
+            throw new ResidentNotHasRoomException();
+        }
+        return modelMapper.map(resident.getRoom(),RoomDto.class);
     }
 }

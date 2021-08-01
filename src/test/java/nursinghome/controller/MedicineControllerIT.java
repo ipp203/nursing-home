@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/delete_tables.sql")
-class MedicineControllerTest {
+class MedicineControllerIT {
 
     @Autowired
     TestRestTemplate template;

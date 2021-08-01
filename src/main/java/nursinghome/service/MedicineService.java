@@ -20,9 +20,9 @@ import java.util.stream.Collectors;
 @Service
 public class MedicineService {
 
-    private MedicineRepository medicineRepository;
-    private ResidentRepository residentRepository;
-    private ModelMapper modelMapper;
+    private final MedicineRepository medicineRepository;
+    private final ResidentRepository residentRepository;
+    private final ModelMapper modelMapper;
 
     public MedicineService(MedicineRepository medicineRepository, ResidentRepository residentRepository, ModelMapper modelMapper) {
         this.medicineRepository = medicineRepository;

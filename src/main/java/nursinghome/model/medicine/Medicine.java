@@ -4,12 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nursinghome.model.resident.Resident;
-import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
-import javax.validation.constraints.Min;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Data
