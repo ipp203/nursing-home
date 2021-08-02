@@ -1,9 +1,6 @@
 package nursinghome.model.room;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import nursinghome.model.resident.Resident;
 
 import javax.persistence.*;
@@ -25,11 +22,12 @@ public class Room {
     @Enumerated(EnumType.STRING)
     private Capacity capacity;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String roomNumber;
 
     @OneToMany(mappedBy = "room")
     @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<Resident> residents;
 
     public Room(Capacity capacity, String roomNumber) {

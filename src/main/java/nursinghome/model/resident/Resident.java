@@ -6,6 +6,7 @@ import nursinghome.model.room.Room;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -47,7 +48,11 @@ public class Resident {
         this.status = status;
     }
 
-    public void deleteMedicines() {
-        medicines.clear();
+    public void addMedicine(Medicine medicine){
+        if(medicines == null){
+            medicines = new HashSet<>();
+        }
+        medicine.setResident(this);
+        medicines.add(medicine);
     }
 }

@@ -3,6 +3,7 @@ package nursinghome.model.medicine;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import nursinghome.model.resident.Resident;
 
 import javax.persistence.*;
@@ -26,6 +27,7 @@ public class Medicine {
     private Type type;
 
     @ManyToOne
+    @ToString.Exclude
     private Resident resident;
 
     public Medicine(String name, int dailyDose, Type type, Resident resident) {
@@ -34,6 +36,4 @@ public class Medicine {
         this.type = type;
         this.resident = resident;
     }
-
-
 }

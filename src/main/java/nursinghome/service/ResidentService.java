@@ -7,6 +7,7 @@ import nursinghome.model.resident.dto.ResidentDto;
 import nursinghome.model.resident.dto.ResidentWithMedicinesDto;
 import nursinghome.model.resident.dto.UpdateResidentStatusCommand;
 import nursinghome.model.room.dto.RoomDto;
+import nursinghome.repository.MedicineRepository;
 import nursinghome.repository.ResidentRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -24,10 +25,12 @@ public class ResidentService {
 
     private final ModelMapper modelMapper;
     private final ResidentRepository residentRepository;
+    private final MedicineRepository medicineRepository;
 
-    public ResidentService(ModelMapper modelMapper, ResidentRepository residentRepository) {
+    public ResidentService(ModelMapper modelMapper, ResidentRepository residentRepository, MedicineRepository medicineRepository) {
         this.modelMapper = modelMapper;
         this.residentRepository = residentRepository;
+        this.medicineRepository = medicineRepository;
     }
 
     @Transactional
@@ -62,7 +65,7 @@ public class ResidentService {
 
         resident.setStatus(command.getStatus());
         if (command.getStatus() != ResidentStatus.RESIDENT) {
-            resident.deleteMedicines();
+            medicineRepository.deleteAllByResidentId(id);
             resident.setRoom(null);
         }
         return modelMapper.map(resident, ResidentDto.class);
@@ -70,7 +73,10 @@ public class ResidentService {
 
     @Transactional
     public void deleteResidentById(long id) {
-        residentRepository.deleteById(id);
+        Resident resident = residentRepository.findById(id)
+                .orElseThrow(() -> createNotFoundException(id));
+
+        residentRepository.delete(resident);
     }
 
     public Map<ResidentStatus, Integer> getResidentSummaryByStatus() {

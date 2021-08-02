@@ -9,7 +9,7 @@ Adatok: név, születési dátum, nem (MALE, FEMALE), státusz (RESIDENT, MOVED_
 
 Lakó felvételének feltétele a 60 és 120 év közötti kor. (application.properties)
 Le lehet kérni a lakók listáját név, státusz, életkor szűréssel, valamint hogy melyik szobában lakik. Egy adott lakó összes adatát és statusz alapú statisztikát. 
-Státuszváltozás esetén a rednszerből törlődnek a szedett gyógyszerek és a szobából is törlésre kerül.
+Státuszváltozás esetén a rendszerből törlődnek a szedett gyógyszerek és a szobából is törlésre kerül.
 
 
 ## Gyógyszerek

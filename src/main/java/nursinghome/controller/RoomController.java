@@ -32,6 +32,12 @@ public class RoomController {
         return service.listResidents(id);
     }
 
+    @GetMapping
+    @Operation(summary = "List rooms")
+    public List<RoomDto> listRooms(){
+        return service.listRooms();
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete room if empty")
     @ResponseStatus(HttpStatus.NO_CONTENT)

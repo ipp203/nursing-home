@@ -18,6 +18,7 @@ import javax.transaction.Transactional;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RoomService {
@@ -80,6 +81,12 @@ public class RoomService {
         return new EntityNotFoundException(
                 URI.create("rooms/not-found"),
                 "Room not found",
-                "Room not found wth id: " + roomId);
+                "Room not found with id: " + roomId);
+    }
+
+    public List<RoomDto> listRooms() {
+        return roomRepository.findAll().stream()
+                .map(room->modelMapper.map(room,RoomDto.class))
+                .collect(Collectors.toList());
     }
 }
