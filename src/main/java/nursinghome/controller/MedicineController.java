@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/nursinghome/medicine")
+@RequestMapping("/api/nursinghome/medicines")
 public class MedicineController {
 
     private final MedicineService service;
@@ -23,11 +23,11 @@ public class MedicineController {
         this.service = service;
     }
 
-    @PostMapping("/{residentId}")
+    @PostMapping
     @Operation(summary = "Save medicine to resident")
     @ResponseStatus(HttpStatus.CREATED)
-    public MedicineDto createMedicine(@Valid @RequestBody CreateMedicineCommand command, @PathVariable("residentId") long residentId) {
-        return service.createMedicine(residentId, command);
+    public MedicineDto createMedicine(@Valid @RequestBody CreateMedicineCommand command) {
+        return service.createMedicine(command);
     }
 
     @PutMapping("/{id}")

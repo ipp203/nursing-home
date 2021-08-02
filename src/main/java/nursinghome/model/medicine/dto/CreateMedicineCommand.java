@@ -26,4 +26,12 @@ public class CreateMedicineCommand {
     @Schema(description = "Type of medicine (TABLET, INJECTION, DROPS, CREAM)", required = true, example = "TABLET")
     private Type type;
 
+    @NotNull
+    private long residentId;
+
+    public CreateMedicineCommand(String name, int dailyDose, Type type) {
+        this.name = name;
+        this.dailyDose = dailyDose;
+        this.type = type;
+    }
 }

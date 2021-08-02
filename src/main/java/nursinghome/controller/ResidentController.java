@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/nursinghome/resident")
+@RequestMapping("/api/nursinghome/residents")
 public class ResidentController {
 
     private final ResidentService service;

@@ -30,6 +30,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @Sql(scripts = "/delete_tables.sql")
 class RoomControllerIT {
 
+    private static final String BASE_URL = "/api/nursinghome/rooms";
+
     @Autowired
     TestRestTemplate template;
 
@@ -52,7 +54,7 @@ class RoomControllerIT {
 
     @Test
     void createRoom() {
-        RoomDto result = template.postForObject("/api/nursinghome/room",
+        RoomDto result = template.postForObject(BASE_URL,
                 new CreateRoomCommand("101", Capacity.SINGLE),
                 RoomDto.class);
 
@@ -63,7 +65,7 @@ class RoomControllerIT {
     void addResident() {
         RoomDto room = saveRoom(new CreateRoomCommand("101", Capacity.SINGLE));
 
-        RoomDto result = template.exchange("/api/nursinghome/room/{id}?residentId={residentId}",
+        RoomDto result = template.exchange(BASE_URL + "/{id}?residentId={residentId}",
                         HttpMethod.PUT,
                         null,
                         RoomDto.class,
@@ -79,7 +81,7 @@ class RoomControllerIT {
         RoomDto room1 = saveRoom(new CreateRoomCommand("101", Capacity.DOUBLE));
         RoomDto room2 = saveRoom(new CreateRoomCommand("102", Capacity.SINGLE));
 
-        String putUrl = "/api/nursinghome/room/{id}?residentId={residentId}";
+        String putUrl = BASE_URL + "/{id}?residentId={residentId}";
 
         template.exchange(putUrl, HttpMethod.PUT, null, RoomDto.class,
                         Map.of("id", room1.getId(), "residentId", resident1.getId()))
@@ -99,7 +101,7 @@ class RoomControllerIT {
         assertNotNull(roomDto2);
         assertEquals(1, roomDto2.getResidents().size());
 
-        List<ResidentDto> room1Residents = template.exchange("/api/nursinghome/room/{id}",
+        List<ResidentDto> room1Residents = template.exchange(BASE_URL + "/{id}",
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<List<ResidentDto>>() {
@@ -115,7 +117,7 @@ class RoomControllerIT {
     void addNotResidentResident() {
         RoomDto room = saveRoom(new CreateRoomCommand("101", Capacity.SINGLE));
 
-        Problem problem = template.exchange("/api/nursinghome/room/{id}?residentId={residentId}",
+        Problem problem = template.exchange(BASE_URL + "/{id}?residentId={residentId}",
                         HttpMethod.PUT,
                         null,
                         Problem.class,
@@ -129,7 +131,7 @@ class RoomControllerIT {
     @Test
     void listResidents() {
         RoomDto room1 = saveRoom(new CreateRoomCommand("101", Capacity.DOUBLE));
-        String url = "/api/nursinghome/room/{id}?residentId={residentId}";
+        String url = BASE_URL + "/{id}?residentId={residentId}";
 
         template.exchange(url, HttpMethod.PUT, null, RoomDto.class,
                 room1.getId(), resident1.getId()).getBody();
@@ -138,7 +140,7 @@ class RoomControllerIT {
                 room1.getId(), resident2.getId()).getBody();
 
 
-        List<ResidentDto> room1Residents = template.exchange("/api/nursinghome/room/{id}",
+        List<ResidentDto> room1Residents = template.exchange(BASE_URL + "/{id}",
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<List<ResidentDto>>() {
@@ -154,9 +156,9 @@ class RoomControllerIT {
     void deleteEmptyRoom() {
         RoomDto room1 = saveRoom(new CreateRoomCommand("101", Capacity.DOUBLE));
 
-        template.delete("/api/nursinghome/room/" + room1.getId());
+        template.delete(BASE_URL + "/" + room1.getId());
 
-        Problem problem = template.exchange("/api/nursinghome/room/{id}?residentId={residentId}",
+        Problem problem = template.exchange(BASE_URL + "/{id}?residentId={residentId}",
                         HttpMethod.PUT,
                         null,
                         Problem.class,
@@ -171,7 +173,7 @@ class RoomControllerIT {
     void deleteNotEmptyRoom() {
         RoomDto room1 = saveRoom(new CreateRoomCommand("101", Capacity.DOUBLE));
 
-        template.exchange("/api/nursinghome/room/{id}?residentId={residentId}",
+        template.exchange(BASE_URL + "/{id}?residentId={residentId}",
                         HttpMethod.PUT,
                         null,
                         RoomDto.class,
@@ -179,7 +181,7 @@ class RoomControllerIT {
                 .getBody();
 
 
-        Problem problem = template.exchange("/api/nursinghome/room/" + room1.getId(),
+        Problem problem = template.exchange(BASE_URL + "/" + room1.getId(),
                 HttpMethod.DELETE,
                 null,
                 Problem.class).getBody();
@@ -192,7 +194,7 @@ class RoomControllerIT {
     void getResidentRoom() {
         RoomDto room1 = saveRoom(new CreateRoomCommand("101", Capacity.DOUBLE));
 
-        String url = "/api/nursinghome/room/{id}?residentId={residentId}";
+        String url = BASE_URL + "/{id}?residentId={residentId}";
 
         template.exchange(url, HttpMethod.PUT, null, RoomDto.class,
                 room1.getId(), resident1.getId()).getBody();
@@ -200,7 +202,7 @@ class RoomControllerIT {
         template.exchange(url, HttpMethod.PUT, null, RoomDto.class,
                 room1.getId(), resident2.getId()).getBody();
 
-        RoomDto roomDto = template.getForObject("/api/nursinghome/resident/{id}/room",
+        RoomDto roomDto = template.getForObject("/api/nursinghome/residents/{id}/room",
                 RoomDto.class, resident1.getId());
 
         assertNotNull(roomDto);
@@ -209,8 +211,6 @@ class RoomControllerIT {
 
 
     private RoomDto saveRoom(CreateRoomCommand command) {
-        return template.postForObject("/api/nursinghome/room",
-                command,
-                RoomDto.class);
+        return template.postForObject(BASE_URL, command, RoomDto.class);
     }
 }

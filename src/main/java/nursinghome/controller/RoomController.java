@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/nursinghome/room")
+@RequestMapping("/api/nursinghome/rooms")
 public class RoomController {
 
     private final RoomService service;

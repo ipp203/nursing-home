@@ -32,14 +32,15 @@ public class MedicineService {
     }
 
     @Transactional
-    public MedicineDto createMedicine(long residentId, CreateMedicineCommand command) {
-        Resident resident = residentRepository.findLiveResidentById(residentId)
+    public MedicineDto createMedicine(CreateMedicineCommand command) {
+        Resident resident = residentRepository.findLiveResidentById(command.getResidentId())
                 .orElseThrow(() -> new EntityNotFoundException(
                         URI.create("residents/resident-not-found"),
                         "Resident not found",
-                        "Resident with id not found, id: " + residentId));
+                        "Resident with id not found, id: " + command.getResidentId()));
 
         Medicine medicine = new Medicine(command.getName(), command.getDailyDose(), command.getType(), resident);
+        medicineRepository.save(medicine);
         resident.addMedicine(medicine);
         return modelMapper.map(medicine, MedicineDto.class);
     }

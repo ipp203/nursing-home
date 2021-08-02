@@ -31,6 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @Sql(scripts = "/delete_tables.sql")
 class MedicineControllerIT {
 
+    private static final String BASE_URL = "/api/nursinghome/medicines";
+
     @Autowired
     TestRestTemplate template;
 
@@ -44,26 +46,27 @@ class MedicineControllerIT {
 
     @BeforeEach
     void init() {
+        savedResident1 = template.postForObject("/api/nursinghome/residents",
+                new CreateResidentCommand("John Doe", LocalDate.of(1950, 10, 1), Gender.MALE),
+                ResidentWithMedicinesDto.class);
+        savedResident2 = template.postForObject("/api/nursinghome/residents",
+                new CreateResidentCommand("Jane Doe", LocalDate.of(1953, 10, 1), Gender.FEMALE),
+                ResidentWithMedicinesDto.class);
+
         med1 = new CreateMedicineCommand("Algopyrin", 4, Type.TABLET);
         med2 = new CreateMedicineCommand("Nospa", 3, Type.TABLET);
         med3 = new CreateMedicineCommand("Nospa", 1, Type.INJECTION);
         med4 = new CreateMedicineCommand("Algopyrin", 3, Type.TABLET);
 
-        savedResident1 = template.postForObject("/api/nursinghome/resident",
-                new CreateResidentCommand("John Doe", LocalDate.of(1950, 10, 1), Gender.MALE),
-                ResidentWithMedicinesDto.class);
-        savedResident2 = template.postForObject("/api/nursinghome/resident",
-                new CreateResidentCommand("Jane Doe", LocalDate.of(1953, 10, 1), Gender.FEMALE),
-                ResidentWithMedicinesDto.class);
     }
 
     @Test
     void createMedicine() {
-        template.postForObject("/api/nursinghome/medicine/" + savedResident1.getId(),
-                new CreateMedicineCommand("Nurofen", 4, Type.DROPS),
+        template.postForObject(BASE_URL,
+                new CreateMedicineCommand("Nurofen", 4, Type.DROPS, savedResident1.getId()),
                 MedicineDto.class);
 
-        ResidentWithMedicinesDto resident = template.getForObject("/api/nursinghome/resident/" + savedResident1.getId(),
+        ResidentWithMedicinesDto resident = template.getForObject("/api/nursinghome/residents/" + savedResident1.getId(),
                 ResidentWithMedicinesDto.class);
 
         assertEquals(1, resident.getMedicines().size());
@@ -73,8 +76,8 @@ class MedicineControllerIT {
     @Test
     void createMedicineWithWrongResidentId() {
         long wrongId = savedResident2.getId() * 1000;
-        Problem problem = template.postForObject("/api/nursinghome/medicine/" + wrongId,
-                new CreateMedicineCommand("Nurofen", 4, Type.DROPS),
+        Problem problem = template.postForObject(BASE_URL,
+                new CreateMedicineCommand("Nurofen", 4, Type.DROPS, wrongId),
                 Problem.class);
 
         assertEquals(Status.NOT_FOUND, problem.getStatus());
@@ -84,7 +87,7 @@ class MedicineControllerIT {
     void updateDailyDose() {
         MedicineDto medicine = saveMedicine(savedResident1.getId(), med1);
 
-        MedicineDto updatedMedicine = template.exchange("/api/nursinghome/medicine/" + medicine.getId(),
+        MedicineDto updatedMedicine = template.exchange(BASE_URL + "/" + medicine.getId(),
                 HttpMethod.PUT,
                 new HttpEntity<>(new UpdateDailyDoseCommand(2)),
                 MedicineDto.class).getBody();
@@ -98,7 +101,7 @@ class MedicineControllerIT {
         MedicineDto medicine = saveMedicine(savedResident1.getId(), med1);
         long wrongId = 1000 * medicine.getId();
 
-        Problem problem = template.exchange("/api/nursinghome/medicine/" + wrongId,
+        Problem problem = template.exchange(BASE_URL + "/" + wrongId,
                 HttpMethod.PUT,
                 new HttpEntity<>(new UpdateDailyDoseCommand(2)),
                 Problem.class).getBody();
@@ -112,7 +115,7 @@ class MedicineControllerIT {
         saveMedicine(savedResident1.getId(), med1);
         saveMedicine(savedResident1.getId(), med2);
 
-        List<MedicineDto> medicines = template.exchange("/api/nursinghome/medicine",
+        List<MedicineDto> medicines = template.exchange(BASE_URL,
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<List<MedicineDto>>() {
@@ -131,7 +134,7 @@ class MedicineControllerIT {
         saveMedicine(savedResident2.getId(), med3);
         saveMedicine(savedResident2.getId(), med4);
 
-        Map<String, Integer> result = template.exchange("/api/nursinghome/medicine/dailysum",
+        Map<String, Integer> result = template.exchange(BASE_URL + "/dailysum",
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<Map<String, Integer>>() {
@@ -147,14 +150,14 @@ class MedicineControllerIT {
     void deleteMedicineById() {
         MedicineDto medicine = saveMedicine(savedResident1.getId(), med1);
 
-        ResidentWithMedicinesDto resident = template.getForObject("/api/nursinghome/resident/" + savedResident1.getId(),
+        ResidentWithMedicinesDto resident = template.getForObject("/api/nursinghome/residents/" + savedResident1.getId(),
                 ResidentWithMedicinesDto.class);
 
         assertEquals(1, resident.getMedicines().size());
 
-        template.delete("/api/nursinghome/medicine/" + medicine.getId());
+        template.delete(BASE_URL + "/" + medicine.getId());
 
-        ResidentWithMedicinesDto residentWithDeletedMedicine = template.getForObject("/api/nursinghome/resident/" + savedResident1.getId(),
+        ResidentWithMedicinesDto residentWithDeletedMedicine = template.getForObject("/api/nursinghome/residents/" + savedResident1.getId(),
                 ResidentWithMedicinesDto.class);
 
         assertEquals(0, residentWithDeletedMedicine.getMedicines().size());
@@ -167,14 +170,14 @@ class MedicineControllerIT {
         saveMedicine(savedResident2.getId(),med1);
         saveMedicine(savedResident2.getId(),med2);
 
-        List<MedicineDto> initialMedicines = template.exchange("/api/nursinghome/medicine",
+        List<MedicineDto> initialMedicines = template.exchange(BASE_URL,
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<List<MedicineDto>>() {}).getBody();
 
-        template.delete("/api/nursinghome/resident/" + savedResident1.getId());
+        template.delete("/api/nursinghome/residents/" + savedResident1.getId());
 
-        List<MedicineDto> medicines = template.exchange("/api/nursinghome/medicine",
+        List<MedicineDto> medicines = template.exchange(BASE_URL,
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<List<MedicineDto>>() {}).getBody();
@@ -187,7 +190,8 @@ class MedicineControllerIT {
     }
 
     private MedicineDto saveMedicine(long residentId, CreateMedicineCommand medicine) {
-        return template.postForObject("/api/nursinghome/medicine/" + residentId,
+        medicine.setResidentId(residentId);
+        return template.postForObject(BASE_URL,
                 medicine,
                 MedicineDto.class);
     }
