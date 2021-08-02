@@ -1,7 +1,7 @@
 package nursinghome.service;
 
+import nursinghome.model.EntityNotFoundException;
 import nursinghome.model.medicine.Medicine;
-import nursinghome.model.medicine.MedicineNotFoundException;
 import nursinghome.model.medicine.dto.CreateMedicineCommand;
 import nursinghome.model.medicine.dto.MedicineDto;
 import nursinghome.model.medicine.dto.UpdateDailyDoseCommand;
@@ -12,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,7 +33,12 @@ public class MedicineService {
 
     @Transactional
     public MedicineDto createMedicine(long residentId, CreateMedicineCommand command) {
-        Resident resident = residentRepository.findById(residentId).orElseThrow(() -> new MedicineNotFoundException(residentId));
+        Resident resident = residentRepository.findById(residentId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        URI.create("residents/resident-not-found"),
+                        "Resident not found",
+                        "Resident with id not found, id: " + residentId));
+
         Medicine medicine = new Medicine(command.getName(), command.getDailyDose(), command.getType(), resident);
         medicineRepository.save(medicine);
         return modelMapper.map(medicine, MedicineDto.class);
@@ -40,7 +46,12 @@ public class MedicineService {
 
     @Transactional
     public MedicineDto updateDailyDose(long id, UpdateDailyDoseCommand command) {
-        Medicine medicine = medicineRepository.findById(id).orElseThrow(() -> new MedicineNotFoundException(id));
+        Medicine medicine = medicineRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        URI.create("medicines/medicine-not-found"),
+                        "Medicine not found",
+                        "Medicine not found, id: " + id));
+
         medicine.setDailyDose(command.getDailyDose());
         return modelMapper.map(medicine, MedicineDto.class);
     }
@@ -59,7 +70,11 @@ public class MedicineService {
 
     @Transactional
     public void deleteMedicineById(long id) {
-        Medicine medicine = medicineRepository.findById(id).orElseThrow(() -> new MedicineNotFoundException(id));
+        Medicine medicine = medicineRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                URI.create("medicines/medicine-not-found"),
+                "Medicine not found",
+                "Medicine not found, id: " + id));
         medicineRepository.delete(medicine);
     }
 }

@@ -1,5 +1,6 @@
 package nursinghome.service;
 
+import nursinghome.model.EntityNotFoundException;
 import nursinghome.model.resident.*;
 import nursinghome.model.resident.dto.CreateResidentCommand;
 import nursinghome.model.resident.dto.ResidentDto;
@@ -11,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +38,9 @@ public class ResidentService {
     }
 
     public ResidentWithMedicinesDto getResidentById(long id) {
-        Resident resident = residentRepository.findById(id).orElseThrow(() -> new ResidentNotFoundException(id));
+        Resident resident = residentRepository.findById(id)
+                .orElseThrow(() -> createNotFoundException(id));
+
         return modelMapper.map(resident, ResidentWithMedicinesDto.class);
     }
 
@@ -53,7 +57,9 @@ public class ResidentService {
 
     @Transactional
     public ResidentDto updateResidentStatus(long id, UpdateResidentStatusCommand command) {
-        Resident resident = residentRepository.findById(id).orElseThrow(() -> new ResidentNotFoundException(id));
+        Resident resident = residentRepository.findById(id)
+                .orElseThrow(() -> createNotFoundException(id));
+
         resident.setStatus(command.getStatus());
         if (command.getStatus() != ResidentStatus.RESIDENT) {
             resident.deleteMedicines();
@@ -73,10 +79,19 @@ public class ResidentService {
     }
 
     public RoomDto getResidentsRoom(long id) {
-        Resident resident = residentRepository.findById(id).orElseThrow(()->new ResidentNotFoundException(id));
+        Resident resident = residentRepository.findById(id)
+                .orElseThrow(()-> createNotFoundException(id));
+
         if(resident.getRoom() == null){
             throw new ResidentNotHasRoomException();
         }
         return modelMapper.map(resident.getRoom(),RoomDto.class);
+    }
+
+    private EntityNotFoundException createNotFoundException(long residentId){
+        return new EntityNotFoundException(
+                URI.create("residents/resident-not-found"),
+                "Resident not found",
+                "Resident with id not found, id: " + residentId);
     }
 }
