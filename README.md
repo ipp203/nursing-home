@@ -15,7 +15,7 @@ Státuszváltozás esetén a rednszerből törlődnek a szedett gyógyszerek és
 
 Adatok: név, napi adag, típus(TABLET, INJECTION, DROPS, CREAM)
 Gyógyszert csak lakóhoz lehet rendelni és a napi adagot lehet változtatni.
-Le lehet kérdezni gyógyszereket név szerinti szűréssel és statisztikát a gyógyszerek listáját a napi szükséges mennyiséggel.
+Le lehet kérdezni gyógyszereket név szerinti szűréssel és statisztikát a gyógyszerek listájával és a napi szükséges mennyiséggel.
 
 ## Szobák
 
