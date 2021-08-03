@@ -1,12 +1,12 @@
 package nursinghome.controller;
 
-import nursinghome.model.medicine.Type;
-import nursinghome.model.medicine.dto.CreateMedicineCommand;
-import nursinghome.model.medicine.dto.MedicineDto;
-import nursinghome.model.medicine.dto.UpdateDailyDoseCommand;
-import nursinghome.model.resident.Gender;
-import nursinghome.model.resident.dto.CreateResidentCommand;
-import nursinghome.model.resident.dto.ResidentWithMedicinesDto;
+import nursinghome.medicine.model.Type;
+import nursinghome.medicine.dto.CreateMedicineCommand;
+import nursinghome.medicine.dto.MedicineDto;
+import nursinghome.medicine.dto.UpdateDailyDoseCommand;
+import nursinghome.resident.model.Gender;
+import nursinghome.resident.dto.CreateResidentCommand;
+import nursinghome.resident.dto.ResidentWithMedicinesDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

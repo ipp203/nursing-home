@@ -1,13 +1,13 @@
 package nursinghome.controller;
 
-import nursinghome.model.resident.Gender;
-import nursinghome.model.resident.Resident;
-import nursinghome.model.resident.ResidentStatus;
-import nursinghome.model.resident.dto.ResidentDto;
-import nursinghome.model.room.Capacity;
-import nursinghome.model.room.dto.CreateRoomCommand;
-import nursinghome.model.room.dto.RoomDto;
-import nursinghome.repository.ResidentRepository;
+import nursinghome.resident.model.Gender;
+import nursinghome.resident.model.Resident;
+import nursinghome.resident.model.ResidentStatus;
+import nursinghome.resident.dto.ResidentDto;
+import nursinghome.room.model.Capacity;
+import nursinghome.room.dto.CreateRoomCommand;
+import nursinghome.room.dto.RoomDto;
+import nursinghome.resident.repository.ResidentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
