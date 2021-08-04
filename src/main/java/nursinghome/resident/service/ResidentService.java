@@ -5,7 +5,6 @@ import nursinghome.resident.dto.CreateResidentCommand;
 import nursinghome.resident.dto.ResidentDto;
 import nursinghome.resident.dto.ResidentWithMedicinesDto;
 import nursinghome.resident.dto.UpdateResidentStatusCommand;
-import nursinghome.resident.exception.ResidentNotHasRoomException;
 import nursinghome.resident.model.Resident;
 import nursinghome.resident.model.ResidentStatus;
 import nursinghome.resident.repository.ResidentRepository;
@@ -91,7 +90,9 @@ public class ResidentService {
                 .orElseThrow(()-> createNotFoundException(id));
 
         if(resident.getRoom() == null){
-            throw new ResidentNotHasRoomException();
+            throw new EntityNotFoundException(URI.create("residents/resident-not-has-room"),
+                    "Resident has no room.",
+                    String.format("Resident with %d id doesn't have room", id));
         }
         return modelMapper.map(resident.getRoom(),RoomDto.class);
     }

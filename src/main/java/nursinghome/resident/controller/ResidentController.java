@@ -50,7 +50,7 @@ public class ResidentController {
         return service.listResidents(status, birthBeforeYear, name);
     }
 
-    @GetMapping("/residentsummary")
+    @GetMapping("/summary")
     @Operation(summary = "Number of residents by status")
     public Map<ResidentStatus, Integer> getResidentSummaryByStatus() {
         return service.getResidentSummaryByStatus();
