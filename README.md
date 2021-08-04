@@ -1,27 +1,93 @@
 # Idősek otthona - vizsgaremek
 
-A programban lakókat lehet felvenni, a szedett gyógyszereiket és a szobabeosztást eltárolni.
-Három entitás van: lakó, gyógyszer és szoba.
+A programban idősek otthonába lehet lakókat felvenni, a szedett gyógyszereiket és a szobabeosztást eltárolni.
+Szigorú rend van: a felvétel korhoz kötött, gyógyszereket csak bentlakók kaphatnak.
 
-## Lakók
+Három entitás van: Resident, Medicine és Room.
 
-Adatok: név, születési dátum, nem (MALE, FEMALE), státusz (RESIDENT, MOVED_OUT, DIED)
+## Resident
 
-Lakó felvételének feltétele a 60 és 120 év közötti kor. (application.properties)
-Le lehet kérni a lakók listáját név, státusz, életkor szűréssel, valamint hogy melyik szobában lakik. Egy adott lakó összes adatát és statusz alapú statisztikát. 
-Státuszváltozás esetén a rendszerből törlődnek a szedett gyógyszerek és a szobából is törlésre kerül.
+* Adatok: name, dateOfBirth, gender (MALE, FEMALE), status (RESIDENT, MOVED_OUT, DIED)
+
+####Metódusok
+
+- CREATE **/api/nursinghome/residents**
+
+Lakó felvétele név, életkor és nem megadásával. Feltétel a 60 és 120 év közötti életkor. A határok beállíthatók az *application.properties* fájlban. Státusz: RESIDENT
+
+- UPDATE **/api/nursinghome/residents/{id}**
+
+Lakó státuszának állítása. A gyógyszerek és a szobafoglaltság törlődik ha elköltözik vagy elhunyt.
+
+- DELETE **/api/nursinghome/residents/{id}**
+
+Lakó törlése. Törlődnek a gyógyszerek és a szobafoglalása.
+
+- GET **/api/nursinghome/residents**
+
+Lakók listájának lekérése név, státusz, életkor szűréssel.
+
+- GET **/api/nursinghome/residents/{id}**
+
+Lakó lekérése id alapján. Visszaadja a gyógyszereket és a szobaszámot is.
+
+- GET **/api/nursinghome/residents/{id}/room**
+
+Lakó szobáját lehet lekérdezni az összes lakótárssal.
+
+- GET **api/nursinghome/residents/summary**
+
+Státusz alapú statisztika.
 
 
-## Gyógyszerek
+## Medicine
 
-Adatok: név, napi adag, típus(TABLET, INJECTION, DROPS, CREAM)
+Adatok: name, dailyDose, type (TABLET, INJECTION, DROPS, CREAM), resident
 
-Gyógyszert csak lakóhoz lehet rendelni és a napi adagot lehet változtatni.
-Le lehet kérdezni gyógyszereket név szerinti szűréssel és statisztikát a gyógyszerek listájával és a napi szükséges mennyiséggel.
+####Metódusok
 
-## Szobák
+- CREATE **api/nursinghome/medicines**
 
-Adatok: szoba száma, ágyak száma (SINGLE, DOUBLE, TRIPLE, FOUR_BED)
+Gyógyszer felvétele név, adagolás, típus és lakó azonosító alapján.
 
-Létre lehet hozni szobát és üres szobát lehet törölni.
-Lakókat lehet be- és átköltöztetni.
+- UPDATE **api/nursinghome/medicines/{id}**
+
+Napi adag módosítása gyógyszer azonosító alapján.
+
+- DELETE **api/nursinghome/medicines/{id}**
+
+Gyógyszer törlése azonosító alapján.
+
+- GET **api/nursinghome/medicines**
+
+Gyógyszerek listája név szűréssel
+
+- GET **api/nursinghome/medicines/dailysum**
+
+Statisztika gyógyszerek neve és típusa szerint.
+
+## Room
+
+Adatok: roomNumber, capacity (SINGLE, DOUBLE, TRIPLE, FOUR_BED)
+
+####Metódusok
+
+- CREATE **api/nursinghome/rooms**
+
+Szoba felvétele szobaszám és kapacitás alapján.
+
+- UPDATE **api/nursinghome/rooms/{id}?residentId=1**
+
+Lakót lehet be- vagy átköltöztetni. Csak üres helyre kerülhet lakó. Ha egy szobát már foglal és átköltöztetjük másikba, az eredeti helye felszabadul.
+
+- DELETE **api/nursinghome/rooms/{id}**
+
+Üres szoba törlése
+
+- GET **api/nursinghome/rooms**
+
+Szobák listája szobaszámmal és üres helyek számával.
+
+- GET **api/nursinghome/rooms/{id}**
+
+Egy szoba lekérése lakókkal.
