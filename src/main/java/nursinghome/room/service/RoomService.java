@@ -6,6 +6,7 @@ import nursinghome.resident.dto.ResidentDto;
 import nursinghome.resident.repository.ResidentRepository;
 import nursinghome.room.dto.CreateRoomCommand;
 import nursinghome.room.dto.RoomDto;
+import nursinghome.room.dto.RoomWithEmptyBedDto;
 import nursinghome.room.exception.RoomIsFullException;
 import nursinghome.room.exception.RoomNotEmptyException;
 import nursinghome.room.model.Room;
@@ -84,9 +85,9 @@ public class RoomService {
                 "Room not found with id: " + roomId);
     }
 
-    public List<RoomDto> listRooms() {
+    public List<RoomWithEmptyBedDto> listRooms() {
         return roomRepository.findAll().stream()
-                .map(room->modelMapper.map(room,RoomDto.class))
+                .map(room-> new RoomWithEmptyBedDto(room.getRoomNumber(), room.getCapacity().getNumberOfBeds()-room.getResidents().size()))
                 .collect(Collectors.toList());
     }
 }

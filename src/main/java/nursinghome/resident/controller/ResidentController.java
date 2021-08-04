@@ -1,6 +1,7 @@
 package nursinghome.resident.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import nursinghome.resident.dto.CreateResidentCommand;
 import nursinghome.resident.dto.ResidentDto;
 import nursinghome.resident.dto.ResidentWithMedicinesDto;
@@ -19,6 +20,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/nursinghome/residents")
+@Tag(name = "Resident Management")
 public class ResidentController {
 
     private final ResidentService service;
@@ -35,7 +37,7 @@ public class ResidentController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get resident and own medicines by id")
+    @Operation(summary = "Get resident with his medicines and room by id")
     public ResidentWithMedicinesDto getResidentById(@PathVariable("id") long id) {
         return service.getResidentById(id);
     }

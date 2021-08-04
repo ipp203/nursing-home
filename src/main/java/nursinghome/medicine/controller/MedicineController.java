@@ -1,6 +1,7 @@
 package nursinghome.medicine.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import nursinghome.medicine.service.MedicineService;
 import nursinghome.medicine.dto.CreateMedicineCommand;
 import nursinghome.medicine.dto.MedicineDto;
@@ -15,6 +16,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/nursinghome/medicines")
+@Tag(name = "Medicine Management")
 public class MedicineController {
 
     private final MedicineService service;
