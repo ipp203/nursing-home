@@ -87,7 +87,7 @@ public class RoomService {
 
     public List<RoomWithEmptyBedDto> listRooms() {
         return roomRepository.findAll().stream()
-                .map(room-> new RoomWithEmptyBedDto(room.getRoomNumber(), room.getCapacity().getNumberOfBeds()-room.getResidents().size()))
+                .map(room-> new RoomWithEmptyBedDto(room.getRoomNumber(), room.getCapacity().getNumberOfBeds()-room.getResidents().size(),room.getCapacity()))
                 .collect(Collectors.toList());
     }
 }

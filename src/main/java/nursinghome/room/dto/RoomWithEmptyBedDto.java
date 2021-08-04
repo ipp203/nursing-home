@@ -3,6 +3,7 @@ package nursinghome.room.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import nursinghome.room.model.Capacity;
 
 @Data
 @NoArgsConstructor
@@ -12,4 +13,6 @@ public class RoomWithEmptyBedDto {
     private String roomNumber;
 
     private int numberOfEmptyBed;
+
+    private Capacity capacity;
 }
