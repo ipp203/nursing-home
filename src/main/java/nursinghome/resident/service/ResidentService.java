@@ -8,6 +8,7 @@ import nursinghome.resident.dto.UpdateResidentStatusCommand;
 import nursinghome.resident.model.Resident;
 import nursinghome.resident.model.ResidentStatus;
 import nursinghome.resident.repository.ResidentRepository;
+import nursinghome.resident.repository.StatusNumber;
 import nursinghome.room.dto.RoomDto;
 import nursinghome.medicine.repository.MedicineRepository;
 import org.modelmapper.ModelMapper;
@@ -72,7 +73,7 @@ public class ResidentService {
 
         resident.setStatus(command.getStatus());
         if (command.getStatus() != ResidentStatus.RESIDENT) {
-            medicineRepository.deleteAllByResidentId(id);
+            medicineRepository.deleteMedicinesByResident(resident);
             resident.setRoom(null);
         }
         return modelMapper.map(resident, ResidentDto.class);
@@ -86,9 +87,13 @@ public class ResidentService {
         residentRepository.delete(resident);
     }
 
-    public Map<ResidentStatus, Integer> getResidentSummaryByStatus() {
-        return residentRepository.findAll().stream()
-                .collect(Collectors.toMap(Resident::getStatus, r -> 1, Integer::sum));
+    public Map<ResidentStatus, Long> getResidentSummaryByStatus() {
+//        return residentRepository.findAll().stream()
+//                .collect(Collectors.toMap(Resident::getStatus, r -> 1, Integer::sum));
+
+        return residentRepository.groupResidentsByStatus().stream()
+                .collect(Collectors.toMap(StatusNumber::getStatus, StatusNumber::getNumber));
+
     }
 
     public RoomDto getResidentsRoom(long id) {

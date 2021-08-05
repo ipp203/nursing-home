@@ -46,7 +46,7 @@ public class MedicineController {
 
     @GetMapping("/dailysum")
     @Operation(summary = "Medicine doses summary by name and type")
-    public Map<String, Integer> summarizeDailyDose() {
+    public Map<String, Long> summarizeDailyDose() {
         return service.summarizeDailyDose();
     }
 

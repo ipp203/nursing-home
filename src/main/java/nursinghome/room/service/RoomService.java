@@ -3,6 +3,7 @@ package nursinghome.room.service;
 import nursinghome.EntityNotFoundException;
 import nursinghome.resident.model.Resident;
 import nursinghome.resident.dto.ResidentDto;
+import nursinghome.resident.model.ResidentStatus;
 import nursinghome.resident.repository.ResidentRepository;
 import nursinghome.room.dto.CreateRoomCommand;
 import nursinghome.room.dto.RoomDto;
@@ -44,8 +45,7 @@ public class RoomService {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> createNotFoundException(id));
 
-        Type targetListType = new TypeToken<List<ResidentDto>>() {
-        }.getType();
+        Type targetListType = new TypeToken<List<ResidentDto>>() {}.getType();
         return modelMapper.map(room.getResidents(), targetListType);
     }
 
@@ -62,7 +62,7 @@ public class RoomService {
 
     @Transactional
     public RoomDto addResident(long roomId, long residentId) {
-        Resident resident = residentRepository.findLiveResidentById(residentId)
+        Resident resident = residentRepository.findResidentByStatusAndId(ResidentStatus.RESIDENT, residentId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         URI.create("residents/resident-not-found"),
                         "Resident not found",
@@ -78,16 +78,16 @@ public class RoomService {
         return modelMapper.map(room, RoomDto.class);
     }
 
+    public List<RoomWithEmptyBedDto> listRooms() {
+        return roomRepository.findAll().stream()
+                .map(room-> new RoomWithEmptyBedDto(room.getRoomNumber(), room.getCapacity().getNumberOfBeds()-room.getResidents().size(),room.getCapacity()))
+                .collect(Collectors.toList());
+    }
+
     private EntityNotFoundException createNotFoundException(long roomId){
         return new EntityNotFoundException(
                 URI.create("rooms/not-found"),
                 "Room not found",
                 "Room not found with id: " + roomId);
-    }
-
-    public List<RoomWithEmptyBedDto> listRooms() {
-        return roomRepository.findAll().stream()
-                .map(room-> new RoomWithEmptyBedDto(room.getRoomNumber(), room.getCapacity().getNumberOfBeds()-room.getResidents().size(),room.getCapacity()))
-                .collect(Collectors.toList());
     }
 }
