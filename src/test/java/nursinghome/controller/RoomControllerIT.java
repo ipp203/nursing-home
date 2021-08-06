@@ -4,6 +4,7 @@ import nursinghome.resident.model.Gender;
 import nursinghome.resident.model.Resident;
 import nursinghome.resident.model.ResidentStatus;
 import nursinghome.resident.dto.ResidentDto;
+import nursinghome.room.dto.UpdateRoomResidentCommand;
 import nursinghome.room.model.Capacity;
 import nursinghome.room.dto.CreateRoomCommand;
 import nursinghome.room.dto.RoomDto;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.jdbc.Sql;
 import org.zalando.problem.Problem;
@@ -65,9 +67,9 @@ class RoomControllerIT {
     void addResident() {
         RoomDto room = saveRoom(new CreateRoomCommand("101", Capacity.SINGLE));
 
-        RoomDto result = template.exchange(BASE_URL + "/{id}?residentId={residentId}",
+        RoomDto result = template.exchange(BASE_URL + "/{id}",
                         HttpMethod.PUT,
-                        null,
+                        new HttpEntity<>(new UpdateRoomResidentCommand(resident1.getId())),
                         RoomDto.class,
                         Map.of("id", room.getId(), "residentId", resident1.getId()))
                 .getBody();
@@ -81,20 +83,27 @@ class RoomControllerIT {
         RoomDto room1 = saveRoom(new CreateRoomCommand("101", Capacity.DOUBLE));
         RoomDto room2 = saveRoom(new CreateRoomCommand("102", Capacity.SINGLE));
 
-        String putUrl = BASE_URL + "/{id}?residentId={residentId}";
+        String putUrl = BASE_URL + "/{id}";
 
-        template.exchange(putUrl, HttpMethod.PUT, null, RoomDto.class,
+        template.exchange(putUrl,
+                        HttpMethod.PUT,
+                        new HttpEntity<>(new UpdateRoomResidentCommand(resident1.getId())),
+                        RoomDto.class,
                         Map.of("id", room1.getId(), "residentId", resident1.getId()))
                 .getBody();
 
-        RoomDto result = template.exchange(putUrl, HttpMethod.PUT, null, RoomDto.class,
+        RoomDto result = template.exchange(putUrl,
+                        HttpMethod.PUT,
+                        new HttpEntity<>(new UpdateRoomResidentCommand(resident2.getId())),
+                        RoomDto.class,
                         Map.of("id", room1.getId(), "residentId", resident2.getId()))
                 .getBody();
 
         assertNotNull(result);
         assertEquals(2, result.getResidents().size());
 
-        RoomDto roomDto2 = template.exchange(putUrl, HttpMethod.PUT, null, RoomDto.class,
+        RoomDto roomDto2 = template.exchange(putUrl, HttpMethod.PUT,
+                        new HttpEntity<>(new UpdateRoomResidentCommand(resident1.getId())), RoomDto.class,
                         Map.of("id", room2.getId(), "residentId", resident1.getId()))
                 .getBody();
 
@@ -117,9 +126,9 @@ class RoomControllerIT {
     void addNotResidentResident() {
         RoomDto room = saveRoom(new CreateRoomCommand("101", Capacity.SINGLE));
 
-        Problem problem = template.exchange(BASE_URL + "/{id}?residentId={residentId}",
+        Problem problem = template.exchange(BASE_URL + "/{id}",
                         HttpMethod.PUT,
-                        null,
+                        new HttpEntity<>(new UpdateRoomResidentCommand(0)),
                         Problem.class,
                         room.getId(), movedOutResident.getId())
                 .getBody();
@@ -133,10 +142,10 @@ class RoomControllerIT {
         RoomDto room1 = saveRoom(new CreateRoomCommand("101", Capacity.DOUBLE));
         String url = BASE_URL + "/{id}?residentId={residentId}";
 
-        template.exchange(url, HttpMethod.PUT, null, RoomDto.class,
+        template.exchange(url, HttpMethod.PUT, new HttpEntity<>(new UpdateRoomResidentCommand(resident1.getId())), RoomDto.class,
                 room1.getId(), resident1.getId()).getBody();
 
-        template.exchange(url, HttpMethod.PUT, null, RoomDto.class,
+        template.exchange(url, HttpMethod.PUT, new HttpEntity<>(new UpdateRoomResidentCommand(resident2.getId())), RoomDto.class,
                 room1.getId(), resident2.getId()).getBody();
 
 
@@ -153,14 +162,14 @@ class RoomControllerIT {
     }
 
     @Test
-    void deleteEmptyRoom() {
+    void deleteEmptyRoomThenAddResident() {
         RoomDto room1 = saveRoom(new CreateRoomCommand("101", Capacity.DOUBLE));
 
         template.delete(BASE_URL + "/" + room1.getId());
 
-        Problem problem = template.exchange(BASE_URL + "/{id}?residentId={residentId}",
+        Problem problem = template.exchange(BASE_URL + "/{id}",
                         HttpMethod.PUT,
-                        null,
+                        new HttpEntity<>(new UpdateRoomResidentCommand(resident1.getId())),
                         Problem.class,
                         room1.getId(), resident1.getId())
                 .getBody();
@@ -173,9 +182,9 @@ class RoomControllerIT {
     void deleteNotEmptyRoom() {
         RoomDto room1 = saveRoom(new CreateRoomCommand("101", Capacity.DOUBLE));
 
-        template.exchange(BASE_URL + "/{id}?residentId={residentId}",
+        template.exchange(BASE_URL + "/{id}",
                         HttpMethod.PUT,
-                        null,
+                        new HttpEntity<>(new UpdateRoomResidentCommand(resident1.getId())),
                         RoomDto.class,
                         room1.getId(), resident1.getId())
                 .getBody();
@@ -196,10 +205,12 @@ class RoomControllerIT {
 
         String url = BASE_URL + "/{id}?residentId={residentId}";
 
-        template.exchange(url, HttpMethod.PUT, null, RoomDto.class,
+        template.exchange(url, HttpMethod.PUT,
+                new HttpEntity<>(new UpdateRoomResidentCommand(resident1.getId())), RoomDto.class,
                 room1.getId(), resident1.getId()).getBody();
 
-        template.exchange(url, HttpMethod.PUT, null, RoomDto.class,
+        template.exchange(url, HttpMethod.PUT,
+                new HttpEntity<>(new UpdateRoomResidentCommand(resident2.getId())), RoomDto.class,
                 room1.getId(), resident2.getId()).getBody();
 
         RoomDto roomDto = template.getForObject("/api/nursinghome/residents/{id}/room",

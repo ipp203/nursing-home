@@ -8,6 +8,7 @@ import nursinghome.resident.repository.ResidentRepository;
 import nursinghome.room.dto.CreateRoomCommand;
 import nursinghome.room.dto.RoomDto;
 import nursinghome.room.dto.RoomWithEmptyBedDto;
+import nursinghome.room.dto.UpdateRoomResidentCommand;
 import nursinghome.room.exception.RoomIsFullException;
 import nursinghome.room.exception.RoomNotEmptyException;
 import nursinghome.room.model.Room;
@@ -61,12 +62,12 @@ public class RoomService {
     }
 
     @Transactional
-    public RoomDto addResident(long roomId, long residentId) {
-        Resident resident = residentRepository.findResidentByStatusAndId(ResidentStatus.RESIDENT, residentId)
+    public RoomDto addResident(long roomId, UpdateRoomResidentCommand command) {
+        Resident resident = residentRepository.findResidentByStatusAndId(ResidentStatus.RESIDENT, command.getResidentId())
                 .orElseThrow(() -> new EntityNotFoundException(
                         URI.create("residents/resident-not-found"),
                         "Resident not found",
-                        "Resident with id not found, id: " + residentId));
+                        "Resident with id not found, id: " + command.getResidentId()));
 
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> createNotFoundException(roomId));

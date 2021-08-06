@@ -6,6 +6,7 @@ import nursinghome.resident.dto.ResidentDto;
 import nursinghome.room.dto.CreateRoomCommand;
 import nursinghome.room.dto.RoomDto;
 import nursinghome.room.dto.RoomWithEmptyBedDto;
+import nursinghome.room.dto.UpdateRoomResidentCommand;
 import nursinghome.room.service.RoomService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -51,8 +52,8 @@ public class RoomController {
 
     @PutMapping("/{roomId}")
     @Operation(summary = "Change resident's room")
-    public RoomDto addResident(@PathVariable("roomId") long roomId, @RequestParam(required = true) long residentId){
-        return service.addResident(roomId, residentId);
+    public RoomDto addResident(@PathVariable("roomId") long roomId, @RequestBody UpdateRoomResidentCommand command){
+        return service.addResident(roomId, command);
     }
 
 }
