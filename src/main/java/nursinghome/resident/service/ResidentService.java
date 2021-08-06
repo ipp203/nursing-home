@@ -1,5 +1,7 @@
 package nursinghome.resident.service;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import nursinghome.EntityNotFoundException;
 import nursinghome.resident.dto.CreateResidentCommand;
 import nursinghome.resident.dto.ResidentDto;
@@ -16,9 +18,11 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -27,9 +31,19 @@ import java.util.stream.Collectors;
 @Service
 public class ResidentService {
 
+    @Data
+    @AllArgsConstructor
+    class QueryData {
+        String name;
+        Object filter;
+        String jpql;
+    }
+
+
     private final ModelMapper modelMapper;
     private final ResidentRepository residentRepository;
     private final MedicineRepository medicineRepository;
+
     @PersistenceContext
     private final EntityManager entityManager;
 
@@ -48,23 +62,10 @@ public class ResidentService {
     }
 
     public ResidentWithMedicinesDto getResidentById(long id) {
-        Resident resident = residentRepository.findById(id)
-                .orElseThrow(() -> createNotFoundException(id));
-
+        Resident resident = residentRepository.findById(id).orElseThrow(() -> createNotFoundException(id));
         return modelMapper.map(resident, ResidentWithMedicinesDto.class);
     }
 
-    public List<ResidentDto> listResidents(Optional<ResidentStatus> status,
-                                           Optional<Integer> birthBeforeYear,
-                                           Optional<String> name) {
-
-        return residentRepository.findAll().stream()
-                .filter(r -> status.isEmpty() || r.getStatus() == status.get())
-                .filter(r -> birthBeforeYear.isEmpty() || r.getDateOfBirth().isBefore(LocalDate.of(birthBeforeYear.get(), 1, 1)))
-                .filter(r -> name.isEmpty() || r.getName().toLowerCase().contains(name.get().toLowerCase()))
-                .map(r -> modelMapper.map(r, ResidentDto.class))
-                .collect(Collectors.toList());
-    }
 
     @Transactional
     public ResidentDto updateResidentStatus(long id, UpdateResidentStatusCommand command) {
@@ -81,24 +82,17 @@ public class ResidentService {
 
     @Transactional
     public void deleteResidentById(long id) {
-        Resident resident = residentRepository.findById(id)
-                .orElseThrow(() -> createNotFoundException(id));
-
+        Resident resident = residentRepository.findById(id).orElseThrow(() -> createNotFoundException(id));
         residentRepository.delete(resident);
     }
 
     public Map<ResidentStatus, Long> getResidentSummaryByStatus() {
-//        return residentRepository.findAll().stream()
-//                .collect(Collectors.toMap(Resident::getStatus, r -> 1, Integer::sum));
-
         return residentRepository.groupResidentsByStatus().stream()
                 .collect(Collectors.toMap(StatusNumber::getStatus, StatusNumber::getNumber));
-
     }
 
     public RoomDto getResidentsRoom(long id) {
-        Resident resident = residentRepository.findById(id)
-                .orElseThrow(() -> createNotFoundException(id));
+        Resident resident = residentRepository.findById(id).orElseThrow(() -> createNotFoundException(id));
 
         if (resident.getRoom() == null) {
             throw new EntityNotFoundException(URI.create("residents/resident-not-has-room"),
@@ -114,74 +108,41 @@ public class ResidentService {
                 "Resident not found",
                 "Resident with id not found, id: " + residentId);
     }
+
+
+    public List<ResidentDto> listResidents(Optional<ResidentStatus> status,
+                                           Optional<Integer> birthBeforeYear,
+                                           Optional<String> name) {
+
+        List<QueryData> parameters = getQueryData(status, birthBeforeYear, name);
+        TypedQuery<Resident> query = getQueryByQueryData(parameters);
+        return query.getResultList().stream()
+                .map(r -> modelMapper.map(r, ResidentDto.class))
+                .collect(Collectors.toList());
+    }
+
+    private List<QueryData> getQueryData(Optional<ResidentStatus> status, Optional<Integer> birthBeforeYear, Optional<String> name) {
+        List<QueryData> parameters = new ArrayList<>();
+
+        status.ifPresent(st -> parameters
+                .add(new QueryData("status", st, "and r.status = :status ")));
+        birthBeforeYear.ifPresent(bby -> parameters
+                .add(new QueryData("datelimit", LocalDate.of(bby, 1, 1), "and r.dateOfBirth < :datelimit ")));
+        name.ifPresent(n -> parameters.
+                add(new QueryData("name", "%" + n + "%", "and r.name like :name")));
+        return parameters;
+    }
+
+    private TypedQuery<Resident> getQueryByQueryData(List<QueryData> parameters) {
+        StringBuilder jpqlQuery = new StringBuilder("select r from Resident r where 1=1 ");
+        for (QueryData parameter : parameters) {
+            jpqlQuery.append(parameter.getJpql());
+        }
+
+        TypedQuery<Resident> query = entityManager.createQuery(jpqlQuery.toString(), Resident.class);
+        for (QueryData parameter : parameters) {
+            query.setParameter(parameter.getName(), parameter.getFilter());
+        }
+        return query;
+    }
 }
-
-
-//    public List<ResidentDto> listResidents(Optional<ResidentStatus> status,
-//                                           Optional<Integer> birthBeforeYear,
-//                                           Optional<String> name) {
-//
-//        @Data
-//        @AllArgsConstructor
-//        class QueryData {
-//            String name;
-//            Object filter;
-//            String jpql;
-//        }
-//
-//        List<QueryData> parameters = new ArrayList<>();
-//
-//        status.ifPresent(st -> parameters
-//                .add(new QueryData("status", st, "r.status = :status ")));
-//        birthBeforeYear.ifPresent(bby -> parameters
-//                .add(new QueryData("datelimit", LocalDate.of(bby, 1, 1), "CAST(datelimit as date) r.dateofbirth < :datelimit ")));
-//        name.ifPresent(n -> parameters.
-//                add(new QueryData("name", "%" + n + "%", "r.name like :name")));
-//
-//
-//        StringBuilder jpql = new StringBuilder("select r from Resident r ");
-//
-//        for (int i = 0; i < parameters.size(); i++) {
-//            if (i == 0) {
-//                jpql.append("where ");
-//            } else {
-//                jpql.append("and ");
-//            }
-//            jpql.append(parameters.get(i).getJpql());
-//        }
-//
-//        List<Resident> result = new ArrayList<>();
-//
-//        switch (parameters.size()) {
-//            case 0 -> {
-//                result = entityManager
-//                        .createQuery(jpql.toString(), Resident.class)
-//                        .getResultList();
-//            }
-//            case 1 -> {
-//                result = entityManager
-//                        .createQuery(jpql.toString(), Resident.class)
-//                        .setParameter(parameters.get(0).getName(), parameters.get(0).getFilter())
-//                        .getResultList();
-//            }
-//            case 2 -> {
-//                result = entityManager
-//                        .createQuery(jpql.toString(), Resident.class)
-//                        .setParameter(parameters.get(0).getName(), parameters.get(0).getFilter())
-//                        .setParameter(parameters.get(1).getName(), parameters.get(1).getFilter())
-//                        .getResultList();
-//            }
-//            case 3 -> {
-//                result = entityManager
-//                        .createQuery(jpql.toString(), Resident.class)
-//                        .setParameter(parameters.get(0).getName(), parameters.get(0).getFilter())
-//                        .setParameter(parameters.get(1).getName(), parameters.get(1).getFilter())
-//                        .setParameter(parameters.get(2).getName(), parameters.get(2).getFilter())
-//                        .getResultList();
-//            }
-//        }
-//
-//        Type targetListType = new TypeToken<List<ResidentDto>>() {}.getType();
-//
-//        return modelMapper.map(result, targetListType);
-//    }
