@@ -76,7 +76,7 @@ Adatok: roomNumber, capacity (SINGLE, DOUBLE, TRIPLE, FOUR_BED)
 
 Szoba felvétele szobaszám és kapacitás alapján.
 
-- UPDATE **api/nursinghome/rooms/{id}?residentId=1**
+- UPDATE **api/nursinghome/rooms/{id}**
 
 Lakót lehet be- vagy átköltöztetni. Csak üres helyre kerülhet lakó. Ha egy szobát már foglal és átköltöztetjük másikba, az eredeti helye felszabadul.
 
