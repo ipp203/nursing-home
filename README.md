@@ -9,7 +9,7 @@ Három entitás van: Resident, Medicine és Room.
 
 * Adatok: name, dateOfBirth, gender (MALE, FEMALE), status (RESIDENT, MOVED_OUT, DIED)
 
- ####Metódusok
+ #### Metódusok
 
 - CREATE **/api/nursinghome/residents**
 
@@ -44,7 +44,7 @@ Státusz alapú statisztika.
 
 Adatok: name, dailyDose, type (TABLET, INJECTION, DROPS, CREAM), resident
 
- ####Metódusok
+ #### Metódusok
 
 - CREATE **api/nursinghome/medicines**
 
@@ -70,7 +70,7 @@ Statisztika gyógyszerek neve és típusa szerint.
 
 Adatok: roomNumber, capacity (SINGLE, DOUBLE, TRIPLE, FOUR_BED)
 
- ####Metódusok
+ #### Metódusok
 
 - CREATE **api/nursinghome/rooms**
 
