@@ -1,15 +1,15 @@
-# Idősek otthona - vizsgaremek
+ # Idősek otthona - vizsgaremek
 
 A programban idősek otthonába lehet lakókat felvenni, a szedett gyógyszereiket és a szobabeosztást eltárolni.
 Szigorú rend van: a felvétel korhoz kötött, gyógyszereket csak bentlakók kaphatnak.
 
 Három entitás van: Resident, Medicine és Room.
 
-## Resident
+ ## Resident
 
 * Adatok: name, dateOfBirth, gender (MALE, FEMALE), status (RESIDENT, MOVED_OUT, DIED)
 
-####Metódusok
+ ####Metódusok
 
 - CREATE **/api/nursinghome/residents**
 
@@ -40,11 +40,11 @@ Lakó szobáját lehet lekérdezni az összes lakótárssal.
 Státusz alapú statisztika.
 
 
-## Medicine
+ ## Medicine
 
 Adatok: name, dailyDose, type (TABLET, INJECTION, DROPS, CREAM), resident
 
-####Metódusok
+ ####Metódusok
 
 - CREATE **api/nursinghome/medicines**
 
@@ -66,11 +66,11 @@ Gyógyszerek listája név szűréssel
 
 Statisztika gyógyszerek neve és típusa szerint.
 
-## Room
+ ## Room
 
 Adatok: roomNumber, capacity (SINGLE, DOUBLE, TRIPLE, FOUR_BED)
 
-####Metódusok
+ ####Metódusok
 
 - CREATE **api/nursinghome/rooms**
 
